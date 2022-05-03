@@ -1,0 +1,739 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CrawlFull 1`] = `
+Object {
+  "Parameters": Object {
+    "BootstrapVersion": Object {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": Object {
+    "bucketsNestedStackbucketsNestedStackResource5ABF7215": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/680e43cf6ad43cdc57312de44463f026085d5273464465d325502367f35ed826.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "dailyETLNestedStackdailyETLNestedStackResource0EE06665": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckETL6DE36BA5Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckETL6DE36BA5Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckProcessedCrawler2B4DD97CArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckProcessedCrawler2B4DD97CArn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckRawCrawler5EB49B01Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckRawCrawler5EB49B01Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunETLDCAF12C5Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunETLDCAF12C5Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunProcessedCrawler567B8F33Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunProcessedCrawler567B8F33Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunRawCrawlerD1C8CD0FArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunRawCrawlerD1C8CD0FArn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdassendResults77BB49C9Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdassendResults77BB49C9Arn",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/e41c9bb597f91996fa57f7462cd95af0b1d815a4103c21c54320f5b96bb0efbc.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "fullETLNestedStackfullETLNestedStackResource754AB7F4": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckETL6DE36BA5Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckETL6DE36BA5Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckProcessedCrawler2B4DD97CArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckProcessedCrawler2B4DD97CArn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckRawCrawler5EB49B01Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckRawCrawler5EB49B01Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunETLDCAF12C5Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunETLDCAF12C5Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunProcessedCrawler567B8F33Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunProcessedCrawler567B8F33Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunRawCrawlerD1C8CD0FArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunRawCrawlerD1C8CD0FArn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdassendResults77BB49C9Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdassendResults77BB49C9Arn",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/0825671dccca902ba19f98148da476ad5d1903ea8a74835a772cb189b3d8adcc.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "glueNestedStackglueNestedStackResource76513E3D": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsglueScripts673138D3Arn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsglueScripts673138D3Arn",
+            ],
+          },
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsglueScripts673138D3Ref": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsglueScripts673138D3Ref",
+            ],
+          },
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsprocessedCDRbucketAB6823F0Arn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsprocessedCDRbucketAB6823F0Arn",
+            ],
+          },
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsprocessedCDRbucketAB6823F0Ref": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsprocessedCDRbucketAB6823F0Ref",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/a6a6f51a2a63519969a363defad8ab576ebeac41950a28ec39950722ac565574.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "lambdasNestedStacklambdasNestedStackResource7684F162": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsprocessedCDRbucketAB6823F0Arn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsprocessedCDRbucketAB6823F0Arn",
+            ],
+          },
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsprocessedCDRbucketAB6823F0Ref": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsprocessedCDRbucketAB6823F0Ref",
+            ],
+          },
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsresultsBucket1E12C075Arn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsresultsBucket1E12C075Arn",
+            ],
+          },
+          "referencetoCrawlFullbucketsNestedStackbucketsNestedStackResource46B7F4C7OutputsCrawlFullbucketsresultsBucket1E12C075Ref": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.CrawlFullbucketsresultsBucket1E12C075Ref",
+            ],
+          },
+          "referencetoCrawlFullglueNestedStackglueNestedStackResourceAA4F595AOutputsCrawlFullgluecdrDatabase31CC3A14Ref": Object {
+            "Fn::GetAtt": Array [
+              "glueNestedStackglueNestedStackResource76513E3D",
+              "Outputs.CrawlFullgluecdrDatabase31CC3A14Ref",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/51677de72f93c1a4fbd38b88d0e32efb5849eb803ee0d8e9d2c8f6625de9a83f.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "reportNestedStackreportNestedStackResourceA3033E76": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdascheckQuery3094DF77Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdascheckQuery3094DF77Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdasrunQuery1D43AA03Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdasrunQuery1D43AA03Arn",
+            ],
+          },
+          "referencetoCrawlFulllambdasNestedStacklambdasNestedStackResource8E213EA9OutputsCrawlFulllambdassendReport98BB6025Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.CrawlFulllambdassendReport98BB6025Arn",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/8c89a7fe891aeea8828e1db9b838dba062d8088969cada20f5871e37be05b17a.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+  },
+  "Rules": Object {
+    "CheckBootstrapVersion": Object {
+      "Assertions": Array [
+        Object {
+          "Assert": Object {
+            "Fn::Not": Array [
+              Object {
+                "Fn::Contains": Array [
+                  Array [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  Object {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`FullBucket 1`] = `
+Object {
+  "Parameters": Object {
+    "BootstrapVersion": Object {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": Object {
+    "bucketsNestedStackbucketsNestedStackResource5ABF7215": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/d8f23d0cea739b22ae7d3e6edd68a400666779bcc6b1e46819c7b28e201e247f.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "dailyETLNestedStackdailyETLNestedStackResource0EE06665": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckETL4DC2135DArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckETL4DC2135DArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckProcessedCrawler0B3FC56CArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckProcessedCrawler0B3FC56CArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckRawCrawler94126AFBArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckRawCrawler94126AFBArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunETLFAD1302BArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunETLFAD1302BArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunProcessedCrawler4BAA6172Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunProcessedCrawler4BAA6172Arn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunRawCrawler37C96C50Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunRawCrawler37C96C50Arn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdassendResults492D165EArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdassendResults492D165EArn",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/adc03f4aefd0469a7b395e9124d20db87473d17f218fffad9176d44a10d7d504.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "fullETLNestedStackfullETLNestedStackResource754AB7F4": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckETL4DC2135DArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckETL4DC2135DArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckProcessedCrawler0B3FC56CArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckProcessedCrawler0B3FC56CArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckRawCrawler94126AFBArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckRawCrawler94126AFBArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunETLFAD1302BArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunETLFAD1302BArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunProcessedCrawler4BAA6172Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunProcessedCrawler4BAA6172Arn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunRawCrawler37C96C50Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunRawCrawler37C96C50Arn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdassendResults492D165EArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdassendResults492D165EArn",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/913da43846beff728808069c3a74d60ff9dd02861a576902fcd6ce702b06eb04.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "glueNestedStackglueNestedStackResource76513E3D": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsglueScripts8166D329Arn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsglueScripts8166D329Arn",
+            ],
+          },
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsglueScripts8166D329Ref": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsglueScripts8166D329Ref",
+            ],
+          },
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsprocessedCDRbucket5C83494EArn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsprocessedCDRbucket5C83494EArn",
+            ],
+          },
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsprocessedCDRbucket5C83494ERef": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsprocessedCDRbucket5C83494ERef",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/d8228df2a49af35cb10f3fd28781da242cb5b656d3d2eef181a64576770d6207.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "lambdasNestedStacklambdasNestedStackResource7684F162": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsprocessedCDRbucket5C83494EArn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsprocessedCDRbucket5C83494EArn",
+            ],
+          },
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsprocessedCDRbucket5C83494ERef": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsprocessedCDRbucket5C83494ERef",
+            ],
+          },
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsresultsBucket9557859AArn": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsresultsBucket9557859AArn",
+            ],
+          },
+          "referencetoFullBucketbucketsNestedStackbucketsNestedStackResource7F8C2392OutputsFullBucketbucketsresultsBucket9557859ARef": Object {
+            "Fn::GetAtt": Array [
+              "bucketsNestedStackbucketsNestedStackResource5ABF7215",
+              "Outputs.FullBucketbucketsresultsBucket9557859ARef",
+            ],
+          },
+          "referencetoFullBucketglueNestedStackglueNestedStackResource65667F50OutputsFullBucketgluecdrDatabase3B56F000Ref": Object {
+            "Fn::GetAtt": Array [
+              "glueNestedStackglueNestedStackResource76513E3D",
+              "Outputs.FullBucketgluecdrDatabase3B56F000Ref",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/cfdb37bf8fe1752c3d5d3df4f4fe735156cefb22929b29e4a012f44246379728.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "reportNestedStackreportNestedStackResourceA3033E76": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdascheckQuery17DB10AAArn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdascheckQuery17DB10AAArn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdasrunQuery93D7F4C6Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdasrunQuery93D7F4C6Arn",
+            ],
+          },
+          "referencetoFullBucketlambdasNestedStacklambdasNestedStackResource01C78B64OutputsFullBucketlambdassendReportB40E4744Arn": Object {
+            "Fn::GetAtt": Array [
+              "lambdasNestedStacklambdasNestedStackResource7684F162",
+              "Outputs.FullBucketlambdassendReportB40E4744Arn",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+              },
+              "/043a0b9694096dbfdcb89b066f4877d7c616f8ee6c1eaf9c1d9c87e967ba9c51.json",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Delete",
+    },
+  },
+  "Rules": Object {
+    "CheckBootstrapVersion": Object {
+      "Assertions": Array [
+        Object {
+          "Assert": Object {
+            "Fn::Not": Array [
+              Object {
+                "Fn::Contains": Array [
+                  Array [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  Object {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
