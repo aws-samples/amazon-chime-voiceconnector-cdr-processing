@@ -1,0 +1,124 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import { Database } from '@aws-cdk/aws-glue-alpha';
+import { RemovalPolicy, Stack } from 'aws-cdk-lib';
+import { CfnTable } from 'aws-cdk-lib/aws-glue';
+import {
+  Role,
+  ServicePrincipal,
+  PolicyDocument,
+  PolicyStatement,
+} from 'aws-cdk-lib/aws-iam';
+import { CfnDeliveryStream } from 'aws-cdk-lib/aws-kinesisfirehose';
+import { LogGroup, LogStream, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { Construct } from 'constructs';
+
+interface GlueResourcesProps {
+  processedCdrsBucket: Bucket;
+  cdrDatabaseName: Database;
+  processedCdrsTable: CfnTable;
+  voiceConnectorId: string;
+}
+export class KinesisResources extends Construct {
+  public kinesisStream: CfnDeliveryStream;
+  constructor(scope: Construct, id: string, props: GlueResourcesProps) {
+    super(scope, id);
+
+    const firehoseRole = new Role(this, 'FirehoseRole', {
+      assumedBy: new ServicePrincipal('firehose.amazonaws.com'),
+      inlinePolicies: {
+        ['kinesisPolicy']: new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              actions: ['*'],
+              resources: ['*'],
+            }),
+          ],
+        }),
+      },
+    });
+
+    props.processedCdrsBucket.grantWrite(firehoseRole);
+
+    const firehoseLogGroup = new LogGroup(this, 'FirehoseLogGroup', {
+      logGroupName: '/aws/firehose/processCdrs',
+      retention: RetentionDays.ONE_WEEK,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    new LogStream(this, 'FirehoseLogStream', {
+      logGroup: firehoseLogGroup,
+      logStreamName: 'processCdrs',
+    });
+
+    this.kinesisStream = new CfnDeliveryStream(
+      this,
+      'cdrProcessDeliveryStream',
+      {
+        deliveryStreamType: 'DirectPut',
+        extendedS3DestinationConfiguration: {
+          bucketArn: props.processedCdrsBucket.bucketArn,
+          roleArn: firehoseRole.roleArn,
+          // Optional error output prefix if required
+          // errorOutputPrefix: 'your-error-output-prefix',
+          prefix:
+            'Amazon-Chime-Voice-Connector-CDRs/voiceconnector=!{partitionKeyFromQuery:voiceconnector}/year=!{partitionKeyFromQuery:year}/month=!{partitionKeyFromQuery:month}/day=!{partitionKeyFromQuery:day}/',
+          errorOutputPrefix:
+            'Amazon-Chime-Voice-Connector-CDRs/error/!{firehose:error-output-type}',
+          bufferingHints: {
+            intervalInSeconds: 60,
+            sizeInMBs: 128,
+          },
+          cloudWatchLoggingOptions: {
+            enabled: true,
+            logGroupName: firehoseLogGroup.logGroupName,
+            logStreamName: 'processCdrs',
+          },
+          dataFormatConversionConfiguration: {
+            enabled: true,
+            inputFormatConfiguration: {
+              deserializer: {
+                openXJsonSerDe: {},
+              },
+            },
+            outputFormatConfiguration: {
+              serializer: {
+                parquetSerDe: {},
+              },
+            },
+            schemaConfiguration: {
+              databaseName: props.cdrDatabaseName.databaseName,
+              tableName: props.processedCdrsTable.ref,
+              region: Stack.of(this).region,
+              versionId: 'LATEST',
+              roleArn: firehoseRole.roleArn,
+            },
+          },
+          dynamicPartitioningConfiguration: {
+            enabled: true,
+          },
+          processingConfiguration: {
+            enabled: true,
+            processors: [
+              {
+                type: 'MetadataExtraction',
+                parameters: [
+                  {
+                    parameterName: 'MetadataExtractionQuery',
+                    parameterValue:
+                      ' voiceconnector: .VoiceConnectorId, year: (.EndTimeEpochSeconds | tonumber | strftime("%Y") | tonumber), month: (.EndTimeEpochSeconds | tonumber | strftime("%m") | tonumber), day: (.EndTimeEpochSeconds | tonumber | strftime("%d") | tonumber) ',
+                  },
+                  {
+                    parameterName: 'JsonParsingEngine',
+                    parameterValue: 'JQ-1.6',
+                  },
+                ],
+              },
+            ],
+          },
+          s3BackupMode: 'Disabled',
+        },
+      },
+    );
+  }
+}
