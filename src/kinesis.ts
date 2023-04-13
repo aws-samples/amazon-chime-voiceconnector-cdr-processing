@@ -62,7 +62,7 @@ export class KinesisResources extends Construct {
           // Optional error output prefix if required
           // errorOutputPrefix: 'your-error-output-prefix',
           prefix:
-            'Amazon-Chime-Voice-Connector-CDRs/voiceconnector=!{partitionKeyFromQuery:voiceconnector}/year=!{partitionKeyFromQuery:year}/month=!{partitionKeyFromQuery:month}/day=!{partitionKeyFromQuery:day}/',
+            'Amazon-Chime-Voice-Connector-CDRs/year=!{partitionKeyFromQuery:year}/month=!{partitionKeyFromQuery:month}/day=!{partitionKeyFromQuery:day}/',
           errorOutputPrefix:
             'Amazon-Chime-Voice-Connector-CDRs/error/!{firehose:error-output-type}',
           bufferingHints: {
@@ -105,8 +105,13 @@ export class KinesisResources extends Construct {
                 parameters: [
                   {
                     parameterName: 'MetadataExtractionQuery',
+                    // prettier-ignore
                     parameterValue:
-                      ' voiceconnector: .VoiceConnectorId, year: (.EndTimeEpochSeconds | tonumber | strftime("%Y") | tonumber), month: (.EndTimeEpochSeconds | tonumber | strftime("%m") | tonumber), day: (.EndTimeEpochSeconds | tonumber | strftime("%d") | tonumber) ',
+                      ' \
+                    year: .EndTimeEpochSeconds| strftime(\"%Y\") ,\
+                    month: .EndTimeEpochSeconds| strftime(\"%m\") ,\
+                    day: .EndTimeEpochSeconds| strftime(\"%d\") \
+                    ',
                   },
                   {
                     parameterName: 'JsonParsingEngine',

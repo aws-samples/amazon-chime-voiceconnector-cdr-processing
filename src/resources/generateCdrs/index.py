@@ -34,7 +34,7 @@ def handler(event, context):
         write_to_s3()
         if (i + 1) % 10 == 0:
             print(f"{i + 1} files uploaded")
-        time.sleep(random.uniform(3.5, 4.5))
+        # time.sleep(random.uniform(3.5, 4.5))
     end_time = time.time()
     print(f"Time taken: {end_time - start_time:.2f} seconds")
 

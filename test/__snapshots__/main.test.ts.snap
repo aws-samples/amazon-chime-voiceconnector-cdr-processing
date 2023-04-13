@@ -272,11 +272,12 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.day.range": "1,31",
             "projection.day.type": "integer",
             "projection.enabled": "true",
+            "projection.month.digits": "2",
             "projection.month.range": "1,12",
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1681233199",
+            "transient_lastDdlTime": "1681319029",
           },
           "PartitionKeys": [
             {
@@ -388,7 +389,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                   {
                     "Ref": "S3ResourcesProcessedprocessedCdrsE11DE56B",
                   },
-                  "/Amazon-Chime-Voice-Connector-CDRs/",
+                  "/Amazon-Chime-Voice-Connector-CDRs",
                 ],
               ],
             },
@@ -563,7 +564,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "Enabled": true,
           },
           "ErrorOutputPrefix": "Amazon-Chime-Voice-Connector-CDRs/error/!{firehose:error-output-type}",
-          "Prefix": "Amazon-Chime-Voice-Connector-CDRs/voiceconnector=!{partitionKeyFromQuery:voiceconnector}/year=!{partitionKeyFromQuery:year}/month=!{partitionKeyFromQuery:month}/day=!{partitionKeyFromQuery:day}/",
+          "Prefix": "Amazon-Chime-Voice-Connector-CDRs/year=!{partitionKeyFromQuery:year}/month=!{partitionKeyFromQuery:month}/day=!{partitionKeyFromQuery:day}/",
           "ProcessingConfiguration": {
             "Enabled": true,
             "Processors": [
@@ -571,7 +572,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 "Parameters": [
                   {
                     "ParameterName": "MetadataExtractionQuery",
-                    "ParameterValue": " voiceconnector: .VoiceConnectorId, year: (.EndTimeEpochSeconds | tonumber | strftime("%Y") | tonumber), month: (.EndTimeEpochSeconds | tonumber | strftime("%m") | tonumber), day: (.EndTimeEpochSeconds | tonumber | strftime("%d") | tonumber) ",
+                    "ParameterValue": "                     year: .EndTimeEpochSeconds| strftime("%Y") ,                    month: .EndTimeEpochSeconds| strftime("%m") ,                    day: .EndTimeEpochSeconds| strftime("%d")                     ",
                   },
                   {
                     "ParameterName": "JsonParsingEngine",
@@ -603,7 +604,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "736d4811fe782f3d7660d9aabeec41e0a785ce22e284bd1821fbed912f6db5ff.zip",
+          "S3Key": "b4065fbe643245c3e0581e095a115069535f33eff0438edbb2ec9da58974416f.zip",
         },
         "Environment": {
           "Variables": {
@@ -612,7 +613,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "TARGET_BUCKET": {
               "Ref": "S3ResourcesRawrawCdrsA3674958",
             },
-            "VOICECONNECTOR_ID": "lb7r5ckbtx03",
+            "VOICECONNECTOR_ID": "s6aecynqn5oc",
           },
         },
         "Handler": "index.handler",

@@ -68,7 +68,7 @@ export class GlueResources extends Construct {
         owner: 'hadoop',
         storageDescriptor: {
           columns: glueSchema,
-          location: `s3://${props.processedCdrsBucket.bucketName}/Amazon-Chime-Voice-Connector-CDRs/`,
+          location: `s3://${props.processedCdrsBucket.bucketName}/Amazon-Chime-Voice-Connector-CDRs`,
           inputFormat:
             'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat',
           outputFormat:
@@ -89,11 +89,11 @@ export class GlueResources extends Construct {
           'projection.year.range': '2023,2026',
           'projection.month.type': 'integer',
           'projection.month.range': '1,12',
+          'projection.month.digits': '2',
           'projection.day.type': 'integer',
           'projection.day.range': '1,31',
           'projection.day.digits': '2',
           'projection.enabled': 'true',
-          // 'projection.voiceconnector.type': 'injected',
           'has_encrypted_data': 'false',
           'transient_lastDdlTime': Math.floor(Date.now() / 1000).toString(),
         },
