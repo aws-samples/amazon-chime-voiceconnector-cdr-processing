@@ -43,16 +43,7 @@ export class LambdaResources extends Construct {
     });
 
     const generateCdrs = new Function(this, 'generateCdrsLambda', {
-      code: Code.fromAsset('src/resources/generateCdrs', {
-        bundling: {
-          image: Runtime.PYTHON_3_9.bundlingImage,
-          command: [
-            'bash',
-            '-c',
-            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
-          ],
-        },
-      }),
+      code: Code.fromAsset('src/resources/generateCdrs'),
       runtime: Runtime.PYTHON_3_9,
       handler: 'index.handler',
       memorySize: 10240,

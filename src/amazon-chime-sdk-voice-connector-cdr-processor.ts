@@ -10,6 +10,7 @@ import {
   S3ResourcesRaw,
   KinesisResources,
 } from './';
+import { envValidator } from './envValidator';
 
 config();
 
@@ -19,6 +20,10 @@ export interface AmazonChimeSdkVoiceConnectorCdrsProps extends StackProps {
   rawCdrsBucketName: string;
   voiceConnectorId: string;
   fileCount: string;
+  bufferHintSize: string;
+  bufferHintInterval: string;
+  projectionYearMin: string;
+  projectionYearMax: string;
 }
 
 export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
@@ -29,6 +34,7 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
   ) {
     super(scope, id, props);
 
+    envValidator(props);
     let rawCdrsBucket: IBucket;
 
     if (props.rawCdrsBucketName === '') {
@@ -55,6 +61,8 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
 
     const glueResources = new GlueResources(this, 'GlueResources', {
       processedCdrsBucket: s3ResourcesProcessed.processedCdrs,
+      projectionYearMax: props.projectionYearMax,
+      projectionYearMin: props.projectionYearMin,
     });
 
     const kinesisResources = new KinesisResources(this, 'KinesisResources', {
@@ -62,6 +70,8 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
       processedCdrsBucket: s3ResourcesProcessed.processedCdrs,
       processedCdrsTable: glueResources.processedCdrsTable,
       voiceConnectorId: props.voiceConnectorId,
+      bufferHintSize: Number(props.bufferHintSize),
+      bufferHintInterval: Number(props.bufferHintInterval),
     });
 
     new LambdaResources(this, 'LambdaResources', {
@@ -93,6 +103,10 @@ const stackProps = {
       .map(() => Math.random().toString(36)[2])
       .join(''),
   fileCount: process.env.FILE_COUNT || '10',
+  projectionYearMin: process.env.PROJECTION_YEAR_MIN || '2023',
+  projectionYearMax: process.env.PROJECTION_YEAR_MAX || '2026',
+  bufferHintSize: process.env.BUFFER_HINT_SIZE || '128',
+  bufferHintInterval: process.env.BUFFER_HINT_INTERVAL || '300',
 };
 
 new AmazonChimeSdkVoiceConnectorCdrs(

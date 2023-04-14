@@ -40,9 +40,61 @@ def handler(event, context):
     s3_object = s3.get_object(Bucket=s3_bucket, Key=s3_object_key)
     data = s3_object['Body'].read().decode('utf-8')
 
-    # Convert the data to JSON and put it to Kinesis Data Stream
+    # Convert the data to JSON and validate the schema
     record = json.loads(data)
-    logger.info('%s Record: %s', LOG_LEVEL, record)
-    firehose.put_record(DeliveryStreamName=KINESIS_STREAM, Record={'Data': json.dumps(record)})
+    validated_record = validate_record(record)
 
-    print(f'Successfully processed file: {s3_object_key}')
+    # Put the validated record to Kinesis Data Stream
+    if validated_record:
+        logger.info('%s Record: %s', LOG_PREFIX, validated_record)
+        firehose.put_record(DeliveryStreamName=KINESIS_STREAM, Record={'Data': json.dumps(validated_record)})
+        print(f'Successfully processed file: {s3_object_key}')
+    else:
+        logger.error('%s Invalid Record: %s', LOG_PREFIX, record)
+
+
+def validate_record(record):
+    # Define the expected schema
+    schema = {
+        "AwsAccountId": str,
+        "TransactionId": str,
+        "CallId": str,
+        "VoiceConnectorId": str,
+        "Status": str,
+        "StatusMessage": str,
+        "BillableDurationSeconds": int,
+        "BillableDurationMinutes": float,
+        "SchemaVersion": str,
+        "SourcePhoneNumber": str,
+        "SourceCountry": str,
+        "DestinationPhoneNumber": str,
+        "DestinationCountry": str,
+        "UsageType": str,
+        "ServiceCode": str,
+        "Direction": str,
+        "StartTimeEpochSeconds": int,
+        "EndTimeEpochSeconds": int,
+        "Region": str,
+        "Streaming": bool,
+        "IsProxyCall": bool
+    }
+
+    # Create a new dictionary with only the keys present in the schema
+    validated_record = {}
+    removed_keys = []
+    for key, value_type in schema.items():
+        if key in record:
+            if isinstance(record[key], value_type):
+                validated_record[key] = record[key]
+                logger.info('%s Validated record[%s]: %s', LOG_PREFIX, key, validated_record[key])
+            else:
+                logger.error('Invalid value type for key %s: %s', key, record[key])
+                removed_keys.append(key)
+        else:
+            logger.info('%s Removed Key: %s', LOG_PREFIX, key)
+            removed_keys.append(key)
+
+    if removed_keys:
+        logger.info('The following keys were removed: %s', removed_keys)
+
+    return validated_record

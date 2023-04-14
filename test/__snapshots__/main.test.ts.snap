@@ -191,7 +191,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": {
         "Code": {
           "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
           "S3Key": "40aa87cdf43c4095cec18bc443965f22ab2f8c1ace47e482a0ba4e35d83b0cc9.zip",
         },
@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1681319029",
+            "transient_lastDdlTime": "1681436149",
           },
           "PartitionKeys": [
             {
@@ -545,9 +545,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               "DatabaseName": {
                 "Ref": "GlueResourcesAmazonChimeSdkVoiceConnectorCdrsDB7BCD97",
               },
-              "Region": {
-                "Ref": "AWS::Region",
-              },
+              "Region": "us-east-1",
               "RoleARN": {
                 "Fn::GetAtt": [
                   "KinesisResourcesFirehoseRole86E2111E",
@@ -572,7 +570,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 "Parameters": [
                   {
                     "ParameterName": "MetadataExtractionQuery",
-                    "ParameterValue": "                     year: .EndTimeEpochSeconds| strftime("%Y") ,                    month: .EndTimeEpochSeconds| strftime("%m") ,                    day: .EndTimeEpochSeconds| strftime("%d")                     ",
+                    "ParameterValue": "{year: .EndTimeEpochSeconds| strftime("%Y"), month: .EndTimeEpochSeconds| strftime("%m"), day: .EndTimeEpochSeconds| strftime("%d")}",
                   },
                   {
                     "ParameterName": "JsonParsingEngine",
@@ -602,9 +600,9 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": {
         "Code": {
           "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "b4065fbe643245c3e0581e095a115069535f33eff0438edbb2ec9da58974416f.zip",
+          "S3Key": "e00df6e6b0067b590f7e36d138d693e7e7726087f004f70fcb8460718be6ad20.zip",
         },
         "Environment": {
           "Variables": {
@@ -613,7 +611,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "TARGET_BUCKET": {
               "Ref": "S3ResourcesRawrawCdrsA3674958",
             },
-            "VOICECONNECTOR_ID": "s6aecynqn5oc",
+            "VOICECONNECTOR_ID": "eac5xxe6z1qy",
           },
         },
         "Handler": "index.handler",
@@ -733,9 +731,9 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": {
         "Code": {
           "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "01bfccbbac01f1e5768202c7e834098c12bd9400bfbbdd8bb751620f4a5e9d03.zip",
+          "S3Key": "f3e5e29c135d1d25905300875cab6fbf5c961a6237ead51d38a41ef1e1b3c8ef.zip",
         },
         "Environment": {
           "Variables": {

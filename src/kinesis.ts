@@ -18,6 +18,8 @@ interface GlueResourcesProps {
   cdrDatabaseName: Database;
   processedCdrsTable: CfnTable;
   voiceConnectorId: string;
+  bufferHintInterval: number;
+  bufferHintSize: number;
 }
 export class KinesisResources extends Construct {
   public kinesisStream: CfnDeliveryStream;
@@ -59,15 +61,13 @@ export class KinesisResources extends Construct {
         extendedS3DestinationConfiguration: {
           bucketArn: props.processedCdrsBucket.bucketArn,
           roleArn: firehoseRole.roleArn,
-          // Optional error output prefix if required
-          // errorOutputPrefix: 'your-error-output-prefix',
           prefix:
             'Amazon-Chime-Voice-Connector-CDRs/year=!{partitionKeyFromQuery:year}/month=!{partitionKeyFromQuery:month}/day=!{partitionKeyFromQuery:day}/',
           errorOutputPrefix:
             'Amazon-Chime-Voice-Connector-CDRs/error/!{firehose:error-output-type}',
           bufferingHints: {
-            intervalInSeconds: 60,
-            sizeInMBs: 128,
+            intervalInSeconds: props.bufferHintInterval,
+            sizeInMBs: props.bufferHintSize,
           },
           cloudWatchLoggingOptions: {
             enabled: true,
@@ -105,13 +105,10 @@ export class KinesisResources extends Construct {
                 parameters: [
                   {
                     parameterName: 'MetadataExtractionQuery',
-                    // prettier-ignore
                     parameterValue:
-                      ' \
-                    year: .EndTimeEpochSeconds| strftime(\"%Y\") ,\
-                    month: .EndTimeEpochSeconds| strftime(\"%m\") ,\
-                    day: .EndTimeEpochSeconds| strftime(\"%d\") \
-                    ',
+                      '{year: .EndTimeEpochSeconds| strftime("%Y"), ' +
+                      'month: .EndTimeEpochSeconds| strftime("%m"), ' +
+                      'day: .EndTimeEpochSeconds| strftime("%d")}',
                   },
                   {
                     parameterName: 'JsonParsingEngine',

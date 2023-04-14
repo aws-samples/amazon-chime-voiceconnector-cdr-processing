@@ -17,11 +17,22 @@ const stackProps = {
       .map(() => Math.random().toString(36)[2])
       .join(''),
   fileCount: process.env.FILE_COUNT || '10',
+  projectionYearMin: process.env.PROJECTION_YEAR_MIN || '2023',
+  projectionYearMax: process.env.PROJECTION_YEAR_MAX || '2026',
+  bufferHintSize: process.env.BUFFER_HINT_SIZE || '128',
+  bufferHintInterval: process.env.BUFFER_HINT_INTERVAL || '300',
+};
+const devEnv = {
+  account: process.env.CDK_DEFAULT_ACCOUNT,
+  region: 'us-east-1',
 };
 
 test('Snapshot', () => {
   const app = new App();
-  const stack = new AmazonChimeSdkVoiceConnectorCdrs(app, 'test', stackProps);
+  const stack = new AmazonChimeSdkVoiceConnectorCdrs(app, 'test', {
+    ...stackProps,
+    env: devEnv,
+  });
 
   const template = Template.fromStack(stack);
   expect(template.toJSON()).toMatchSnapshot();

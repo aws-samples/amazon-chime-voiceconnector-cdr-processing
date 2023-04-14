@@ -1,11 +1,11 @@
 import boto3
-from faker import Faker
 import json
 import time
 import random
 import os
 import logging
 from datetime import datetime, timedelta
+import uuid
 
 # Set LOG_LEVEL using environment variable, fallback to INFO if not present
 logger = logging.getLogger()
@@ -20,6 +20,10 @@ logger.setLevel(LOG_LEVEL)
 TARGET_BUCKET = os.environ['TARGET_BUCKET']
 VOICECONNECTOR_ID = os.environ['VOICECONNECTOR_ID']
 FILE_COUNT = os.environ['FILE_COUNT']
+try:
+    BAD_DATA = os.environ['BAD_DATA']
+except BaseException:
+    BAD_DATA = None
 
 s3 = boto3.resource('s3')
 bucket = s3.Bucket(TARGET_BUCKET)
@@ -42,12 +46,11 @@ def handler(event, context):
 def random_us_e164_number():
     area_code = random.randint(200, 999)
     exchange_code = random.randint(200, 999)
-    line_number = random.randint(0000, 9999)
+    line_number = random.randint(0, 9999)
     return f"+1{area_code:03d}{exchange_code:03d}{line_number:04d}"
 
 
 def generate_json():
-    fake = Faker()
     duration_seconds = random.randint(5 * 60, 10 * 60)
     duration_seconds = duration_seconds - (duration_seconds % 6)
     duration_minutes = duration_seconds / 60
@@ -56,34 +59,61 @@ def generate_json():
     start_time_unix = int(time.mktime(start_time.timetuple()))
     end_time_unix = start_time_unix + duration_seconds
 
-    return {
-        "AwsAccountId": "654178722619",
-        "TransactionId": fake.uuid4(),
-        "CallId": fake.uuid4(),
-        "VoiceConnectorId": "fb5twdsrnczr5emo8iweix",
-        "Status": "Completed",
-        "StatusMessage": "Normal Call Clearing",
-        "BillableDurationSeconds": duration_seconds,
-        "BillableDurationMinutes": duration_minutes,
-        "SchemaVersion": "2.0",
-        "SourcePhoneNumber": random_us_e164_number(),
-        "SourceCountry": "US",
-        "DestinationPhoneNumber": random_us_e164_number(),
-        "DestinationCountry": "US",
-        "UsageType": "USE1-US-inbound-minutes",
-        "ServiceCode": "AmazonChimeVoiceConnector",
-        "Direction": "Inbound",
-        "StartTimeEpochSeconds": start_time_unix,
-        "EndTimeEpochSeconds": end_time_unix,
-        "Region": "us-east-1",
-        "Streaming": True,
-        "IsProxyCall": False
-    }
+    if BAD_DATA is not None:
+        return {
+            "AwsAccountId": "654178722619",
+            "TransactionId": str(uuid.uuid4()),
+            "CallId": str(uuid.uuid4()),
+            "VoiceConnectorId": VOICECONNECTOR_ID,
+            "Status": "Completed",
+            "StatusMessage": "Normal Call Clearing",
+            "BillableDurationSeconds": duration_seconds,
+            "BillableDurationMinutes": duration_minutes,
+            "SchemaVersion": "2.0",
+            "SourcePhoneNumber": random_us_e164_number(),
+            "SourceCountry": "US",
+            "DestinationPhoneNumber": random_us_e164_number(),
+            "DestinationCountry": "US",
+            "UsageType": "USE1-US-inbound-minutes",
+            "ServiceCode": "AmazonChimeVoiceConnector",
+            "Direction": "Inbound",
+            "StartTimeEpochSeconds": start_time_unix,
+            "EndTimeEpochSeconds": end_time_unix,
+            "Region": "us-east-1",
+            "Streaming": True,
+            "IsProxyCall": False,
+            "BadData": BAD_DATA
+        }
+    else:
+        return {
+            "AwsAccountId": "654178722619",
+            "TransactionId": str(uuid.uuid4()),
+            "CallId": str(uuid.uuid4()),
+            "VoiceConnectorId": "fb5twdsrnczr5emo8iweix",
+            "Status": "Completed",
+            "StatusMessage": "Normal Call Clearing",
+            "BillableDurationSeconds": duration_seconds,
+            "BillableDurationMinutes": duration_minutes,
+            "SchemaVersion": "2.0",
+            "SourcePhoneNumber": random_us_e164_number(),
+            "SourceCountry": "US",
+            "DestinationPhoneNumber": random_us_e164_number(),
+            "DestinationCountry": "US",
+            "UsageType": "USE1-US-inbound-minutes",
+            "ServiceCode": "AmazonChimeVoiceConnector",
+            "Direction": "Inbound",
+            "StartTimeEpochSeconds": start_time_unix,
+            "EndTimeEpochSeconds": end_time_unix,
+            "Region": "us-east-1",
+            "Streaming": True,
+            "IsProxyCall": False,
+        }
 
 
 def write_to_s3():
     data = generate_json()
     today = datetime.today().strftime('%Y/%m/%d')
     key = f"Amazon-Chime-Voice-Connector-CDRs/json/{VOICECONNECTOR_ID}/{today}/{time.time()}.json"
+    logger.info('%s Writing record to S3: %s', LOG_PREFIX, data)
     obj = bucket.Object(key)
     obj.put(Body=json.dumps(data))

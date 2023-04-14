@@ -7,6 +7,8 @@ import { Construct } from 'constructs';
 
 interface GlueResourcesProps {
   processedCdrsBucket: Bucket;
+  projectionYearMin: string;
+  projectionYearMax: string;
 }
 export class GlueResources extends Construct {
   public cdrDatabase: Database;
@@ -44,7 +46,6 @@ export class GlueResources extends Construct {
     ];
 
     const partitionKeys: CfnTable.ColumnProperty[] = [
-      // { name: 'voiceconnector', type: 'string' },
       {
         name: 'year',
         type: 'int',
@@ -86,7 +87,7 @@ export class GlueResources extends Construct {
           'EXTERNAL': 'TRUE',
           'parquet.compression': 'SNAPPY',
           'projection.year.type': 'integer',
-          'projection.year.range': '2023,2026',
+          'projection.year.range': `${props.projectionYearMin},${props.projectionYearMax}`,
           'projection.month.type': 'integer',
           'projection.month.range': '1,12',
           'projection.month.digits': '2',
