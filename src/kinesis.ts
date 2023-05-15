@@ -2,12 +2,7 @@
 import { Database } from '@aws-cdk/aws-glue-alpha';
 import { RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { CfnTable } from 'aws-cdk-lib/aws-glue';
-import {
-  Role,
-  ServicePrincipal,
-  PolicyDocument,
-  PolicyStatement,
-} from 'aws-cdk-lib/aws-iam';
+import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { CfnDeliveryStream } from 'aws-cdk-lib/aws-kinesisfirehose';
 import { LogGroup, LogStream, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -27,16 +22,6 @@ export class KinesisResources extends Construct {
 
     const firehoseRole = new Role(this, 'FirehoseRole', {
       assumedBy: new ServicePrincipal('firehose.amazonaws.com'),
-      inlinePolicies: {
-        ['kinesisPolicy']: new PolicyDocument({
-          statements: [
-            new PolicyStatement({
-              actions: ['*'],
-              resources: ['*'],
-            }),
-          ],
-        }),
-      },
     });
 
     props.processedCdrsBucket.grantWrite(firehoseRole);

@@ -193,7 +193,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "40aa87cdf43c4095cec18bc443965f22ab2f8c1ace47e482a0ba4e35d83b0cc9.zip",
+          "S3Key": "350185a1069fa20a23a583e20c77f6844218bd73097902362dc94f1a108f5d89.zip",
         },
         "Description": {
           "Fn::Join": [
@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1684122449",
+            "transient_lastDdlTime": "1684131595",
           },
           "PartitionKeys": [
             {
@@ -440,21 +440,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           ],
           "Version": "2012-10-17",
         },
-        "Policies": [
-          {
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "*",
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "kinesisPolicy",
-          },
-        ],
       },
       "Type": "AWS::IAM::Role",
     },
@@ -654,21 +639,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             ],
           },
         ],
-        "Policies": [
-          {
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "*",
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "stateMachinePolicy",
-          },
-        ],
       },
       "Type": "AWS::IAM::Role",
     },
@@ -732,7 +702,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "f3e5e29c135d1d25905300875cab6fbf5c961a6237ead51d38a41ef1e1b3c8ef.zip",
+          "S3Key": "43b561555c797503d89939b19a63995e562a4e58c2f239688ce7ef6feeee27b9.zip",
         },
         "Environment": {
           "Variables": {
@@ -840,9 +810,14 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": "*",
+                  "Action": "firehose:PutRecord",
                   "Effect": "Allow",
-                  "Resource": "*",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "KinesisResourcescdrProcessDeliveryStreamA711DC23",
+                      "Arn",
+                    ],
+                  },
                 },
               ],
               "Version": "2012-10-17",

@@ -24,16 +24,6 @@ export class LambdaResources extends Construct {
 
     const generateCdrsRole = new Role(this, 'generateCdrsRole', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
-      inlinePolicies: {
-        ['stateMachinePolicy']: new PolicyDocument({
-          statements: [
-            new PolicyStatement({
-              actions: ['*'],
-              resources: ['*'],
-            }),
-          ],
-        }),
-      },
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
@@ -63,8 +53,8 @@ export class LambdaResources extends Construct {
         ['stateMachinePolicy']: new PolicyDocument({
           statements: [
             new PolicyStatement({
-              actions: ['*'],
-              resources: ['*'],
+              actions: ['firehose:PutRecord'],
+              resources: [props.kinesisStream.attrArn],
             }),
           ],
         }),

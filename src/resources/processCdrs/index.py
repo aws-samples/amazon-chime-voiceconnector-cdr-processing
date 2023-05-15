@@ -86,7 +86,7 @@ def validate_record(record):
         if key in record:
             if isinstance(record[key], value_type):
                 validated_record[key] = record[key]
-                logger.info('%s Validated record[%s]: %s', LOG_PREFIX, key, validated_record[key])
+                logger.debug('%s Validated record[%s]: %s', LOG_PREFIX, key, validated_record[key])
             else:
                 logger.error('Invalid value type for key %s: %s', key, record[key])
                 removed_keys.append(key)
