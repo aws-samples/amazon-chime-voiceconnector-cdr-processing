@@ -1,29 +1,27 @@
 import { AmazonChimeSdkVoiceConnectorCdrsProps } from './amazon-chime-sdk-voice-connector-cdr-processor';
 
 const currentYear = new Date().getFullYear();
-// const validRegions = [
-//   'us-east-1',
-//   'us-west-2',
-//   'ca-central-1',
-//   'eu-west-1',
-//   'eu-central-1',
-//   'eu-west-2',
-//   'ap-southeast-1',
-//   'ap-northeast-1',
-//   'ap-southeast-2',
-//   'ap-northeast-2',
-// ];
+const validRegions = [
+  'us-east-1',
+  'us-west-2',
+  'ca-central-1',
+  'eu-west-1',
+  'eu-central-1',
+  'eu-west-2',
+  'ap-southeast-1',
+  'ap-northeast-1',
+  'ap-southeast-2',
+  'ap-northeast-2',
+];
 
 export function envValidator(props: AmazonChimeSdkVoiceConnectorCdrsProps) {
-  // if (
-  //   !props.env ||
-  //   !props.env.region ||
-  //   !validRegions.includes(props.env.region) ||
-  //   props.env.region === 'undefined'
-  // ) {
-  //   console.log(props.env);
-  //   throw new Error(`Stack region must be one of: ${validRegions.join(', ')}`);
-  // }
+  if (props.env && props.env.region) {
+    if (!validRegions.includes(props.env.region)) {
+      throw new Error(
+        `Stack region must be one of: ${validRegions.join(', ')}`,
+      );
+    }
+  }
 
   if (props.logLevel) {
     if (
@@ -98,4 +96,6 @@ export function envValidator(props: AmazonChimeSdkVoiceConnectorCdrsProps) {
   if (bufferHintInterval < 60 || bufferHintInterval > 900) {
     throw new Error('bufferHintInterval must be between 60 and 900');
   }
+
+  return true;
 }

@@ -215,7 +215,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1681436149",
+            "transient_lastDdlTime": "1684122449",
           },
           "PartitionKeys": [
             {
@@ -602,7 +602,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "e00df6e6b0067b590f7e36d138d693e7e7726087f004f70fcb8460718be6ad20.zip",
+          "S3Key": "83a1c00b9d442293e1c597bda0425afb989a90f084ef4bf379d63e7ba3f32986.zip",
         },
         "Environment": {
           "Variables": {
@@ -611,7 +611,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "TARGET_BUCKET": {
               "Ref": "S3ResourcesRawrawCdrsA3674958",
             },
-            "VOICECONNECTOR_ID": "eac5xxe6z1qy",
           },
         },
         "Handler": "index.handler",

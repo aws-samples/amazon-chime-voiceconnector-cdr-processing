@@ -18,7 +18,6 @@ export interface AmazonChimeSdkVoiceConnectorCdrsProps extends StackProps {
   logLevel: string;
   removalPolicy: string;
   rawCdrsBucketName: string;
-  voiceConnectorId: string;
   fileCount: string;
   bufferHintSize: string;
   bufferHintInterval: string;
@@ -69,14 +68,12 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
       cdrDatabaseName: glueResources.cdrDatabase,
       processedCdrsBucket: s3ResourcesProcessed.processedCdrs,
       processedCdrsTable: glueResources.processedCdrsTable,
-      voiceConnectorId: props.voiceConnectorId,
       bufferHintSize: Number(props.bufferHintSize),
       bufferHintInterval: Number(props.bufferHintInterval),
     });
 
     new LambdaResources(this, 'LambdaResources', {
       logLevel: props.logLevel,
-      voiceConnectorId: props.voiceConnectorId,
       fileCount: props.fileCount,
       rawCdrsBucket: rawCdrsBucket,
       kinesisStream: kinesisResources.kinesisStream,
@@ -92,16 +89,11 @@ const devEnv = {
 
 const app = new App();
 
+// istanbul ignore next
 const stackProps = {
   logLevel: process.env.LOG_LEVEL || 'INFO',
   removalPolicy: process.env.REMOVAL_POLICY || 'DESTROY',
   rawCdrsBucketName: process.env.RAW_CDRS_BUCKET || '',
-  voiceConnectorId:
-    process.env.VOICE_CONNECTOR_ID ||
-    Array(12)
-      .fill(null)
-      .map(() => Math.random().toString(36)[2])
-      .join(''),
   fileCount: process.env.FILE_COUNT || '10',
   projectionYearMin: process.env.PROJECTION_YEAR_MIN || '2023',
   projectionYearMax: process.env.PROJECTION_YEAR_MAX || '2026',

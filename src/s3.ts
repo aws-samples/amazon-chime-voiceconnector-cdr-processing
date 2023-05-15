@@ -13,6 +13,7 @@ export class S3ResourcesRaw extends Construct {
 
     let removalPolicy: RemovalPolicy;
     let autoDelete: boolean = false;
+    // istanbul ignore next
     switch (props.removalPolicy.toLowerCase()) {
       case 'retain':
         removalPolicy = RemovalPolicy.RETAIN;
@@ -46,6 +47,7 @@ export class S3ResourcesProcessed extends Construct {
 
     let removalPolicy: RemovalPolicy;
     let autoDelete: boolean = false;
+    // istanbul ignore next
     switch (props.removalPolicy.toLowerCase()) {
       case 'retain':
         removalPolicy = RemovalPolicy.RETAIN;

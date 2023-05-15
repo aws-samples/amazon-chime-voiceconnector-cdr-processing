@@ -17,7 +17,6 @@ interface GlueResourcesProps {
   processedCdrsBucket: Bucket;
   cdrDatabaseName: Database;
   processedCdrsTable: CfnTable;
-  voiceConnectorId: string;
   bufferHintInterval: number;
   bufferHintSize: number;
 }

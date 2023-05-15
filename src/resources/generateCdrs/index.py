@@ -1,4 +1,3 @@
-import boto3
 import json
 import time
 import random
@@ -6,6 +5,7 @@ import os
 import logging
 from datetime import datetime, timedelta
 import uuid
+import boto3
 
 # Set LOG_LEVEL using environment variable, fallback to INFO if not present
 logger = logging.getLogger()
@@ -18,7 +18,6 @@ except BaseException:
 logger.setLevel(LOG_LEVEL)
 
 TARGET_BUCKET = os.environ['TARGET_BUCKET']
-VOICECONNECTOR_ID = os.environ['VOICECONNECTOR_ID']
 FILE_COUNT = os.environ['FILE_COUNT']
 try:
     BAD_DATA = os.environ['BAD_DATA']
@@ -64,7 +63,7 @@ def generate_json():
             "AwsAccountId": "654178722619",
             "TransactionId": str(uuid.uuid4()),
             "CallId": str(uuid.uuid4()),
-            "VoiceConnectorId": VOICECONNECTOR_ID,
+            "VoiceConnectorId": "fb5twdsrnczr5emo8iweix",
             "Status": "Completed",
             "StatusMessage": "Normal Call Clearing",
             "BillableDurationSeconds": duration_seconds,
@@ -113,7 +112,7 @@ def generate_json():
 def write_to_s3():
     data = generate_json()
     today = datetime.today().strftime('%Y/%m/%d')
-    key = f"Amazon-Chime-Voice-Connector-CDRs/json/{VOICECONNECTOR_ID}/{today}/{time.time()}.json"
+    key = f"Amazon-Chime-Voice-Connector-CDRs/json/fb5twdsrnczr5emo8iweix/{today}/{time.time()}.json"
     logger.info('%s Writing record to S3: %s', LOG_PREFIX, data)
     obj = bucket.Object(key)
     obj.put(Body=json.dumps(data))

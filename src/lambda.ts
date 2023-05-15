@@ -14,7 +14,6 @@ import { Construct } from 'constructs';
 
 interface LambdaResourcesProps {
   rawCdrsBucket: IBucket;
-  voiceConnectorId: string;
   fileCount: string;
   logLevel: string;
   kinesisStream: CfnDeliveryStream;
@@ -52,7 +51,6 @@ export class LambdaResources extends Construct {
       environment: {
         LOG_LEVEL: props.logLevel,
         TARGET_BUCKET: props.rawCdrsBucket.bucketName,
-        VOICECONNECTOR_ID: props.voiceConnectorId,
         FILE_COUNT: props.fileCount,
       },
     });
