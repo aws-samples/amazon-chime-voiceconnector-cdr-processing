@@ -46,7 +46,6 @@ export class KinesisResources extends Construct {
       },
     });
 
-
     props.processedCdrsBucket.grantWrite(firehoseRole);
 
     const firehoseLogGroup = new LogGroup(this, 'FirehoseLogGroup', {
