@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1685774239",
+            "transient_lastDdlTime": "1685774363",
           },
           "PartitionKeys": [
             {
