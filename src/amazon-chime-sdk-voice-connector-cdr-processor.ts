@@ -7,6 +7,7 @@ import {
   LambdaResources,
   GlueResources,
   S3ResourcesProcessed,
+  S3QueryOutput,
   S3ResourcesRaw,
   KinesisResources,
 } from './';
@@ -23,6 +24,8 @@ export interface AmazonChimeSdkVoiceConnectorCdrsProps extends StackProps {
   bufferHintInterval: string;
   projectionYearMin: string;
   projectionYearMax: string;
+  cronSetting: string;
+  athenaQuery: string;
 }
 
 export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
@@ -72,11 +75,22 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
       bufferHintInterval: Number(props.bufferHintInterval),
     });
 
+    const s3QueryOutput = new S3QueryOutput(
+      this,
+      'S3QueryOutput',
+      {
+        removalPolicy: props.removalPolicy,
+      },
+    );
+
     new LambdaResources(this, 'LambdaResources', {
       logLevel: props.logLevel,
       fileCount: props.fileCount,
       rawCdrsBucket: rawCdrsBucket,
+      s3QueryOutput: s3QueryOutput.athenaQueryOutput,
       kinesisStream: kinesisResources.kinesisStream,
+      cronSetting: props.cronSetting,
+      athenaQuery: props.athenaQuery,
     });
   }
 }
@@ -99,6 +113,8 @@ const stackProps = {
   projectionYearMax: process.env.PROJECTION_YEAR_MAX || '2026',
   bufferHintSize: process.env.BUFFER_HINT_SIZE || '128',
   bufferHintInterval: process.env.BUFFER_HINT_INTERVAL || '300',
+  athenaQuery: process.env.ATHENA_QUERY || 'SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;',
+  cronSetting: process.env.CRON || 'cron(0 0 1 * ? *)',
 };
 
 new AmazonChimeSdkVoiceConnectorCdrs(

@@ -39,6 +39,40 @@ export class S3ResourcesRaw extends Construct {
   }
 }
 
+export class S3QueryOutput extends Construct {
+  public athenaQueryOutput: Bucket;
+
+  constructor(scope: Construct, id: string, props: S3ResourcesProps) {
+    super(scope, id);
+
+    let removalPolicy: RemovalPolicy;
+    let autoDelete: boolean = false;
+    // istanbul ignore next
+    switch (props.removalPolicy.toLowerCase()) {
+      case 'retain':
+        removalPolicy = RemovalPolicy.RETAIN;
+        break;
+      case 'destroy':
+        removalPolicy = RemovalPolicy.DESTROY;
+        autoDelete = true;
+        break;
+      case 'snapshot':
+        removalPolicy = RemovalPolicy.SNAPSHOT;
+        break;
+      default:
+        removalPolicy = RemovalPolicy.DESTROY;
+    }
+
+    this.athenaQueryOutput = new Bucket(this, 'athenaQueryOutput', {
+      publicReadAccess: false,
+      removalPolicy: removalPolicy,
+      autoDeleteObjects: autoDelete,
+      encryption: BucketEncryption.S3_MANAGED,
+      eventBridgeEnabled: true,
+    });
+  }
+}
+
 export class S3ResourcesProcessed extends Construct {
   public processedCdrs: Bucket;
 
