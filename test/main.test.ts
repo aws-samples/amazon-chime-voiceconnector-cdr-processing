@@ -15,6 +15,9 @@ const stackProps = {
   projectionYearMax: process.env.PROJECTION_YEAR_MAX || '2026',
   bufferHintSize: process.env.BUFFER_HINT_SIZE || '128',
   bufferHintInterval: process.env.BUFFER_HINT_INTERVAL || '300',
+  athenaQuery: process.env.ATHENA_QUERY || 'SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;',
+  cronSetting: process.env.CRON || 'cron(0 0 1 * ? *)',
+  email: process.env.EMAIL || '',
 };
 const devEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
