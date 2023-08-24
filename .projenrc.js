@@ -1,4 +1,6 @@
 const { awscdk } = require('projen');
+const { UpgradeDependenciesSchedule } = require('projen/lib/javascript');
+
 const project = new awscdk.AwsCdkTypeScriptApp({
   cdkVersion: '2.70.0',
   defaultReleaseBranch: 'main',
@@ -13,8 +15,10 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     ignoreProjen: false,
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
+      schedule: UpgradeDependenciesSchedule.WEEKLY,
     },
   },
+  workflowNodeVersion: '18.x',
   autoApproveOptions: {
     secret: 'GITHUB_TOKEN',
     allowedUsernames: ['schuettc'],

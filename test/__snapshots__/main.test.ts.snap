@@ -193,7 +193,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "350185a1069fa20a23a583e20c77f6844218bd73097902362dc94f1a108f5d89.zip",
+          "S3Key": "a657308e723bb9460b800cb3b47dadb74e28243edfe246bf7755c45ec312eb97.zip",
         },
         "Description": {
           "Fn::Join": [
@@ -207,7 +207,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             ],
           ],
         },
-        "Handler": "__entrypoint__.handler",
+        "Handler": "index.handler",
         "MemorySize": 128,
         "Role": {
           "Fn::GetAtt": [
@@ -215,7 +215,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "Arn",
           ],
         },
-        "Runtime": "nodejs16.x",
+        "Runtime": "nodejs18.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1692905202",
+            "transient_lastDdlTime": "1692910697",
           },
           "PartitionKeys": [
             {
@@ -671,7 +671,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
         },
         "Environment": {
           "Variables": {
-            "ATHENA_QUERY": "SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes, month, year FROM {database}.{table} WHERE (year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) ) group by voiceconnectorid, month, year;",
+            "ATHENA_QUERY": "SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;",
             "DATABASE": "amazon_chime_sdk_voice_connector_cdrs",
             "LOG_LEVEL": "INFO",
             "TABLE": "processed_cdrs",
@@ -1058,7 +1058,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "Mode": "OFF",
         },
         "Name": "recurringSchedule",
-        "ScheduleExpression": "cron(*/15 * * * ? *)",
+        "ScheduleExpression": "cron(0 0 1 * ? *)",
         "Target": {
           "Arn": {
             "Fn::GetAtt": [
@@ -1599,16 +1599,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
     },
     "SnsResourcesCDRReport0EE251E8": {
       "Type": "AWS::SNS::Topic",
-    },
-    "SnsResourcesEmailSubscription4E5AE574": {
-      "Properties": {
-        "Endpoint": "tkoba@amazon.com",
-        "Protocol": "email",
-        "TopicArn": {
-          "Ref": "SnsResourcesCDRReport0EE251E8",
-        },
-      },
-      "Type": "AWS::SNS::Subscription",
     },
   },
   "Rules": {
