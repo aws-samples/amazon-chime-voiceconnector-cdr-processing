@@ -125,13 +125,21 @@ export class LambdaResources extends Construct {
 
     const schedulerRole = new Role(this, 'schedulerRole', {
       assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
+      managedPolicies: [
+        ManagedPolicy.fromAwsManagedPolicyName(
+          'service-role/AWSLambdaBasicExecutionRole',
+        ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          'service-role/AWSLambdaRole',
+        ),
+      ],
     });
 
     new CfnResource(this, 'recurringSchedule', {
       type: 'AWS::Scheduler::Schedule',
       properties: {
         Name: 'recurringSchedule',
-        Description: 'Runs a schedule for every 15 minutes',
+        Description: 'Runs a schedule for every x minutes',
         FlexibleTimeWindow: { Mode: 'OFF' },
         ScheduleExpression: props.cronSetting,
         Target: {
@@ -164,6 +172,8 @@ export class LambdaResources extends Construct {
         TOPIC_ARN: props.snsTopic.topicArn,
       },
     });
+
+    props.s3QueryOutput.grantReadWrite(sendQueryReport);
     props.rawCdrsBucket.bucketName;
     props.s3QueryOutput.addEventNotification(
       EventType.OBJECT_CREATED,

@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1692851926",
+            "transient_lastDdlTime": "1692905202",
           },
           "PartitionKeys": [
             {
@@ -1053,7 +1053,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
     },
     "LambdaResourcesrecurringScheduleC497D547": {
       "Properties": {
-        "Description": "Runs a schedule for every 15 minutes",
+        "Description": "Runs a schedule for every x minutes",
         "FlexibleTimeWindow": {
           "Mode": "OFF",
         },
@@ -1090,11 +1090,38 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           ],
           "Version": "2012-10-17",
         },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaRole",
+              ],
+            ],
+          },
+        ],
       },
       "Type": "AWS::IAM::Role",
     },
     "LambdaResourcessendQueryReportLambdaE328762F": {
       "DependsOn": [
+        "LambdaResourcessendQueryReportRoleDefaultPolicyD2731F51",
         "LambdaResourcessendQueryReportRoleE074E3CB",
       ],
       "Properties": {
@@ -1102,7 +1129,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "f30d6828a624c1825d274e752caa73ef1bd41cd950947db9b090a744c7cd020b.zip",
+          "S3Key": "e1cf85b1bae36a713f18cc5937ce1185745ca427eeb28cdbdeb9c3327391a590.zip",
         },
         "Environment": {
           "Variables": {
@@ -1123,6 +1150,59 @@ def submit_response(event: dict, context, response_status: str, error_message: s
         "Timeout": 15,
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "LambdaResourcessendQueryReportRoleDefaultPolicyD2731F51": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "S3QueryOutputathenaQueryOutput7FBD2000",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "S3QueryOutputathenaQueryOutput7FBD2000",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "LambdaResourcessendQueryReportRoleDefaultPolicyD2731F51",
+        "Roles": [
+          {
+            "Ref": "LambdaResourcessendQueryReportRoleE074E3CB",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "LambdaResourcessendQueryReportRoleE074E3CB": {
       "Properties": {

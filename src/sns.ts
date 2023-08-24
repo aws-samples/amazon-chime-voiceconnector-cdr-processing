@@ -8,7 +8,6 @@ interface SnsResourcesProps {
 }
 
 export class SnsResources extends Construct {
-  public emailSubscription: Subscription;
   public topic: Topic;
 
   constructor(scope: Construct, id: string, props: SnsResourcesProps) {
@@ -17,11 +16,13 @@ export class SnsResources extends Construct {
     // Create an SNS topic
     this.topic = new Topic(this, 'CDRReport');
 
-    // Subscribe an email address to the topic
-    this.emailSubscription = new Subscription(this, 'EmailSubscription', {
-      protocol: SubscriptionProtocol.EMAIL,
-      endpoint: props.email,
-      topic: this.topic,
-    });
+    // Subscribe an email address to the topic as long as emaill address is provided
+    if (props.email != '') {
+      new Subscription(this, 'EmailSubscription', {
+        protocol: SubscriptionProtocol.EMAIL,
+        endpoint: props.email,
+        topic: this.topic,
+      });
+    }
   }
 }

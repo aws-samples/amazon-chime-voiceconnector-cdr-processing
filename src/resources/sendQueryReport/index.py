@@ -32,7 +32,7 @@ def handler(event, context):
     )
 
     sns = boto3.client('sns')
-    message = "Please open the following link to view the generated CDR report. " + signed_url
+    message = "Please open the following link to view the generated CDR report. (URL is valid for 12 hours)\n\n " + signed_url
 
     response = sns.publish(
         TopicArn=TopicArn,
