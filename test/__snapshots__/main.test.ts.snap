@@ -172,11 +172,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               "Effect": "Allow",
               "Resource": "*",
             },
-            {
-              "Action": "s3:GetBucketNotification",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
           ],
           "Version": "2012-10-17",
         },
@@ -282,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1692807800",
+            "transient_lastDdlTime": "1692851926",
           },
           "PartitionKeys": [
             {
@@ -672,15 +667,17 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "5edf2ec3c6c38dd942d8f469753853b08a76d9cf99531318932ba9e141973251.zip",
+          "S3Key": "8e2a20e66a40917a1989d876110b86ee704400b4d7074079fbddad340544dac2.zip",
         },
         "Environment": {
           "Variables": {
-            "ATHENA_QUERY": "SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) group by voiceconnectorid;",
+            "ATHENA_QUERY": "SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes, month, year FROM {database}.{table} WHERE (year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) ) group by voiceconnectorid, month, year;",
             "DATABASE": "amazon_chime_sdk_voice_connector_cdrs",
             "LOG_LEVEL": "INFO",
             "TABLE": "processed_cdrs",
-            "TARGET_BUCKET": "tkoba-cdr-output",
+            "TARGET_BUCKET": {
+              "Ref": "S3QueryOutputathenaQueryOutput7FBD2000",
+            },
           },
         },
         "Handler": "index.handler",
@@ -701,6 +698,9 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "Statement": [
             {
               "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
                 "s3:DeleteObject*",
                 "s3:PutObject",
                 "s3:PutObjectLegalHold",
@@ -784,6 +784,18 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               ],
             ],
           },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonS3FullAccess",
+              ],
+            ],
+          },
         ],
       },
       "Type": "AWS::IAM::Role",
@@ -804,7 +816,9 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "Variables": {
             "FILE_COUNT": "10",
             "LOG_LEVEL": "INFO",
-            "TARGET_BUCKET": "tkoba-cdr-raw",
+            "TARGET_BUCKET": {
+              "Ref": "S3ResourcesRawrawCdrsA3674958",
+            },
           },
         },
         "Handler": "index.handler",
@@ -868,26 +882,22 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":s3:::tkoba-cdr-raw",
-                    ],
+                  "Fn::GetAtt": [
+                    "S3ResourcesRawrawCdrsA3674958",
+                    "Arn",
                   ],
                 },
                 {
                   "Fn::Join": [
                     "",
                     [
-                      "arn:",
                       {
-                        "Ref": "AWS::Partition",
+                        "Fn::GetAtt": [
+                          "S3ResourcesRawrawCdrsA3674958",
+                          "Arn",
+                        ],
                       },
-                      ":s3:::tkoba-cdr-raw/*",
+                      "/*",
                     ],
                   ],
                 },
@@ -957,26 +967,22 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":s3:::tkoba-cdr-raw",
-                    ],
+                  "Fn::GetAtt": [
+                    "S3ResourcesRawrawCdrsA3674958",
+                    "Arn",
                   ],
                 },
                 {
                   "Fn::Join": [
                     "",
                     [
-                      "arn:",
                       {
-                        "Ref": "AWS::Partition",
+                        "Fn::GetAtt": [
+                          "S3ResourcesRawrawCdrsA3674958",
+                          "Arn",
+                        ],
                       },
-                      ":s3:::tkoba-cdr-raw/*",
+                      "/*",
                     ],
                   ],
                 },
@@ -1087,74 +1093,79 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       },
       "Type": "AWS::IAM::Role",
     },
-    "RawCdrsBucketAllowBucketNotificationsTotestLambdaResourcesprocessCdrsLambdaC86D24D403655CDB": {
+    "LambdaResourcessendQueryReportLambdaE328762F": {
+      "DependsOn": [
+        "LambdaResourcessendQueryReportRoleE074E3CB",
+      ],
       "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
+          },
+          "S3Key": "f30d6828a624c1825d274e752caa73ef1bd41cd950947db9b090a744c7cd020b.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "LOG_LEVEL": "INFO",
+            "TOPIC_ARN": {
+              "Ref": "SnsResourcesCDRReport0EE251E8",
+            },
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
           "Fn::GetAtt": [
-            "LambdaResourcesprocessCdrsLambda93CC7BC4",
+            "LambdaResourcessendQueryReportRoleE074E3CB",
             "Arn",
           ],
         },
-        "Principal": "s3.amazonaws.com",
-        "SourceAccount": {
-          "Ref": "AWS::AccountId",
-        },
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":s3:::tkoba-cdr-raw",
-            ],
-          ],
-        },
+        "Runtime": "python3.9",
+        "Timeout": 15,
       },
-      "Type": "AWS::Lambda::Permission",
+      "Type": "AWS::Lambda::Function",
     },
-    "RawCdrsBucketNotificationsF679B4F0": {
-      "DependsOn": [
-        "RawCdrsBucketAllowBucketNotificationsTotestLambdaResourcesprocessCdrsLambdaC86D24D403655CDB",
-      ],
+    "LambdaResourcessendQueryReportRoleE074E3CB": {
       "Properties": {
-        "BucketName": "tkoba-cdr-raw",
-        "Managed": false,
-        "NotificationConfiguration": {
-          "LambdaFunctionConfigurations": [
+        "AssumeRolePolicyDocument": {
+          "Statement": [
             {
-              "Events": [
-                "s3:ObjectCreated:*",
-              ],
-              "Filter": {
-                "Key": {
-                  "FilterRules": [
-                    {
-                      "Name": "prefix",
-                      "Value": "Amazon-Chime-Voice-Connector-CDRs",
-                    },
-                  ],
-                },
-              },
-              "LambdaFunctionArn": {
-                "Fn::GetAtt": [
-                  "LambdaResourcesprocessCdrsLambda93CC7BC4",
-                  "Arn",
-                ],
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
               },
             },
           ],
+          "Version": "2012-10-17",
         },
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691",
-            "Arn",
-          ],
-        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSNSFullAccess",
+              ],
+            ],
+          },
+        ],
       },
-      "Type": "Custom::S3BucketNotifications",
+      "Type": "AWS::IAM::Role",
     },
     "S3QueryOutputathenaQueryOutput7FBD2000": {
       "DeletionPolicy": "Delete",
@@ -1178,6 +1189,28 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Delete",
     },
+    "S3QueryOutputathenaQueryOutputAllowBucketNotificationsTotestLambdaResourcessendQueryReportLambda45A208B656F86118": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaResourcessendQueryReportLambdaE328762F",
+            "Arn",
+          ],
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId",
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "S3QueryOutputathenaQueryOutput7FBD2000",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "S3QueryOutputathenaQueryOutputAutoDeleteObjectsCustomResourceF54A5FEB": {
       "DeletionPolicy": "Delete",
       "DependsOn": [
@@ -1198,6 +1231,9 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "UpdateReplacePolicy": "Delete",
     },
     "S3QueryOutputathenaQueryOutputNotifications5E6876D1": {
+      "DependsOn": [
+        "S3QueryOutputathenaQueryOutputAllowBucketNotificationsTotestLambdaResourcessendQueryReportLambda45A208B656F86118",
+      ],
       "Properties": {
         "BucketName": {
           "Ref": "S3QueryOutputathenaQueryOutput7FBD2000",
@@ -1205,6 +1241,29 @@ def submit_response(event: dict, context, response_status: str, error_message: s
         "Managed": true,
         "NotificationConfiguration": {
           "EventBridgeConfiguration": {},
+          "LambdaFunctionConfigurations": [
+            {
+              "Events": [
+                "s3:ObjectCreated:*",
+              ],
+              "Filter": {
+                "Key": {
+                  "FilterRules": [
+                    {
+                      "Name": "suffix",
+                      "Value": ".csv",
+                    },
+                  ],
+                },
+              },
+              "LambdaFunctionArn": {
+                "Fn::GetAtt": [
+                  "LambdaResourcessendQueryReportLambdaE328762F",
+                  "Arn",
+                ],
+              },
+            },
+          ],
         },
         "ServiceToken": {
           "Fn::GetAtt": [
@@ -1375,6 +1434,101 @@ def submit_response(event: dict, context, response_status: str, error_message: s
         },
       },
       "Type": "AWS::S3::BucketPolicy",
+    },
+    "S3ResourcesRawrawCdrsA3674958": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "S3ResourcesRawrawCdrsAllowBucketNotificationsTotestLambdaResourcesprocessCdrsLambdaC86D24D4FBA32912": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaResourcesprocessCdrsLambda93CC7BC4",
+            "Arn",
+          ],
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId",
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "S3ResourcesRawrawCdrsA3674958",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "S3ResourcesRawrawCdrsNotifications647C1778": {
+      "DependsOn": [
+        "S3ResourcesRawrawCdrsAllowBucketNotificationsTotestLambdaResourcesprocessCdrsLambdaC86D24D4FBA32912",
+      ],
+      "Properties": {
+        "BucketName": {
+          "Ref": "S3ResourcesRawrawCdrsA3674958",
+        },
+        "Managed": true,
+        "NotificationConfiguration": {
+          "EventBridgeConfiguration": {},
+          "LambdaFunctionConfigurations": [
+            {
+              "Events": [
+                "s3:ObjectCreated:*",
+              ],
+              "Filter": {
+                "Key": {
+                  "FilterRules": [
+                    {
+                      "Name": "prefix",
+                      "Value": "Amazon-Chime-Voice-Connector-CDRs",
+                    },
+                  ],
+                },
+              },
+              "LambdaFunctionArn": {
+                "Fn::GetAtt": [
+                  "LambdaResourcesprocessCdrsLambda93CC7BC4",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3BucketNotifications",
+    },
+    "SnsResourcesCDRReport0EE251E8": {
+      "Type": "AWS::SNS::Topic",
+    },
+    "SnsResourcesEmailSubscription4E5AE574": {
+      "Properties": {
+        "Endpoint": "tkoba@amazon.com",
+        "Protocol": "email",
+        "TopicArn": {
+          "Ref": "SnsResourcesCDRReport0EE251E8",
+        },
+      },
+      "Type": "AWS::SNS::Subscription",
     },
   },
   "Rules": {

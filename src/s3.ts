@@ -11,27 +11,28 @@ export class S3ResourcesRaw extends Construct {
   constructor(scope: Construct, id: string, props: S3ResourcesProps) {
     super(scope, id);
 
-    let removalPolicy: RemovalPolicy;
+    // let removalPolicy: RemovalPolicy;
     let autoDelete: boolean = false;
     // istanbul ignore next
-    switch (props.removalPolicy.toLowerCase()) {
-      case 'retain':
-        removalPolicy = RemovalPolicy.RETAIN;
-        break;
-      case 'destroy':
-        removalPolicy = RemovalPolicy.DESTROY;
-        autoDelete = true;
-        break;
-      case 'snapshot':
-        removalPolicy = RemovalPolicy.SNAPSHOT;
-        break;
-      default:
-        removalPolicy = RemovalPolicy.DESTROY;
-    }
+    props.removalPolicy.toLowerCase();
+    // switch (props.removalPolicy.toLowerCase()) {
+    //   case 'retain':
+    //     removalPolicy = RemovalPolicy.RETAIN;
+    //     break;
+    //   case 'destroy':
+    //     removalPolicy = RemovalPolicy.DESTROY;
+    //     autoDelete = true;
+    //     break;
+    //   case 'snapshot':
+    //     removalPolicy = RemovalPolicy.SNAPSHOT;
+    //     break;
+    //   default:
+    //     removalPolicy = RemovalPolicy.DESTROY;
+    // }
 
     this.rawCdrs = new Bucket(this, 'rawCdrs', {
       publicReadAccess: false,
-      removalPolicy: removalPolicy,
+      removalPolicy: RemovalPolicy.RETAIN, //setting to RETAIN manually as CDR setting doesn't like delete policy
       autoDeleteObjects: autoDelete,
       encryption: BucketEncryption.S3_MANAGED,
       eventBridgeEnabled: true,

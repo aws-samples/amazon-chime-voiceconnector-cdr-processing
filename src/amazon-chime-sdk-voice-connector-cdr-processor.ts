@@ -10,12 +10,14 @@ import {
   S3QueryOutput,
   S3ResourcesRaw,
   KinesisResources,
+  SnsResources,
 } from './';
 import { envValidator } from './envValidator';
 
 config();
 
 export interface AmazonChimeSdkVoiceConnectorCdrsProps extends StackProps {
+  email: any;
   logLevel: string;
   removalPolicy: string;
   rawCdrsBucketName: string;
@@ -75,6 +77,10 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
       bufferHintInterval: Number(props.bufferHintInterval),
     });
 
+    const snsResources = new SnsResources(this, 'SnsResources', {
+      email: props.email,
+    });
+
     const s3QueryOutput = new S3QueryOutput(
       this,
       'S3QueryOutput',
@@ -91,6 +97,7 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
       kinesisStream: kinesisResources.kinesisStream,
       cronSetting: props.cronSetting,
       athenaQuery: props.athenaQuery,
+      snsTopic: snsResources.topic,
     });
   }
 }
@@ -115,6 +122,7 @@ const stackProps = {
   bufferHintInterval: process.env.BUFFER_HINT_INTERVAL || '300',
   athenaQuery: process.env.ATHENA_QUERY || 'SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;',
   cronSetting: process.env.CRON || 'cron(0 0 1 * ? *)',
+  email: process.env.EMAIL || '',
 };
 
 new AmazonChimeSdkVoiceConnectorCdrs(

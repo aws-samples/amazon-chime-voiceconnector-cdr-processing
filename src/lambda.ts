@@ -10,6 +10,7 @@ import { CfnDeliveryStream } from 'aws-cdk-lib/aws-kinesisfirehose';
 import { Runtime, Code, Function } from 'aws-cdk-lib/aws-lambda';
 import { IBucket, EventType } from 'aws-cdk-lib/aws-s3';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
+import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
 
 interface LambdaResourcesProps {
@@ -20,6 +21,7 @@ interface LambdaResourcesProps {
   kinesisStream: CfnDeliveryStream;
   cronSetting: string;
   athenaQuery: string;
+  snsTopic: Topic;
 }
 export class LambdaResources extends Construct {
   constructor(scope: Construct, id: string, props: LambdaResourcesProps) {
@@ -98,6 +100,9 @@ export class LambdaResources extends Construct {
         ManagedPolicy.fromAwsManagedPolicyName(
           'AmazonAthenaFullAccess',
         ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          'AmazonS3FullAccess',
+        ),
       ],
     });
 
@@ -111,12 +116,12 @@ export class LambdaResources extends Construct {
         LOG_LEVEL: props.logLevel,
         DATABASE: 'amazon_chime_sdk_voice_connector_cdrs',
         TABLE: 'processed_cdrs',
-        TARGET_BUCKET: 'tkoba-cdr-output',
+        TARGET_BUCKET: props.s3QueryOutput.bucketName,
         ATHENA_QUERY: props.athenaQuery,
       },
     });
 
-    props.s3QueryOutput.grantWrite(generateAthenaQuery);
+    props.s3QueryOutput.grantReadWrite(generateAthenaQuery);
 
     const schedulerRole = new Role(this, 'schedulerRole', {
       assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
@@ -135,5 +140,35 @@ export class LambdaResources extends Construct {
         },
       },
     });
+
+    const sendQueryReportRole = new Role(this, 'sendQueryReportRole', {
+      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [
+        ManagedPolicy.fromAwsManagedPolicyName(
+          'service-role/AWSLambdaBasicExecutionRole',
+        ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          'AmazonSNSFullAccess',
+        ),
+      ],
+    });
+
+    const sendQueryReport = new Function(this, 'sendQueryReportLambda', {
+      code: Code.fromAsset('src/resources/sendQueryReport'),
+      runtime: Runtime.PYTHON_3_9,
+      handler: 'index.handler',
+      role: sendQueryReportRole,
+      timeout: Duration.seconds(15),
+      environment: {
+        LOG_LEVEL: props.logLevel,
+        TOPIC_ARN: props.snsTopic.topicArn,
+      },
+    });
+    props.rawCdrsBucket.bucketName;
+    props.s3QueryOutput.addEventNotification(
+      EventType.OBJECT_CREATED,
+      new LambdaDestination(sendQueryReport),
+      { suffix: '.csv' },
+    );
   }
 }
