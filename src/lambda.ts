@@ -1,4 +1,6 @@
-import { CfnResource, Duration } from 'aws-cdk-lib';
+import { Database } from '@aws-cdk/aws-glue-alpha';
+import { Duration, Stack, CfnResource } from 'aws-cdk-lib';
+import { CfnTable } from 'aws-cdk-lib/aws-glue';
 import {
   ManagedPolicy,
   Role,
@@ -19,9 +21,12 @@ interface LambdaResourcesProps {
   fileCount: string;
   logLevel: string;
   kinesisStream: CfnDeliveryStream;
+  processedCdrsTable: CfnTable;
+  cdrDatabaseName: Database;
   cronSetting: string;
   athenaQuery: string;
   snsTopic: Topic;
+  outputPrefix: string;
 }
 export class LambdaResources extends Construct {
   constructor(scope: Construct, id: string, props: LambdaResourcesProps) {
@@ -55,7 +60,7 @@ export class LambdaResources extends Construct {
     const processCdrsRole = new Role(this, 'processCdrsRole', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
       inlinePolicies: {
-        ['stateMachinePolicy']: new PolicyDocument({
+        ['firehosePolicy']: new PolicyDocument({
           statements: [
             new PolicyStatement({
               actions: ['firehose:PutRecord'],
@@ -93,35 +98,93 @@ export class LambdaResources extends Construct {
 
     const generateAthenaQueryRole = new Role(this, 'generateAthenaQueryRole', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      inlinePolicies: {
+        ['athenaPolicy']: new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              actions: [
+                'athena:StartQueryExecution',
+                'athena:GetQueryExecution',
+              ],
+              resources: ['*'],
+            }),
+          ],
+        }),
+        ['gluePolicy']: new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              actions: ['glue:GetTable'],
+              resources: [
+                `arn:aws:glue:${Stack.of(this).region}:${
+                  Stack.of(this).account
+                }:table/${props.cdrDatabaseName.databaseName}/${
+                  props.processedCdrsTable.ref
+                }`,
+                props.cdrDatabaseName.catalogArn,
+                props.cdrDatabaseName.databaseArn,
+              ],
+            }),
+          ],
+        }),
+        ['s3Policy']: new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              actions: [
+                's3:GetBucketLocation',
+                's3:GetObject',
+                's3:ListBucket',
+                's3:ListBucketMultipartUploads',
+                's3:AbortMultipartUpload',
+                's3:PutObject',
+                's3:ListMultipartUploadParts',
+              ],
+              resources: [
+                props.s3QueryOutput.bucketArn,
+                `${props.s3QueryOutput.bucketArn}/*`,
+              ],
+            }),
+            new PolicyStatement({
+              actions: [
+                's3:ListBucket',
+                's3:GetBucketLocation',
+                's3:ListAllMyBuckets',
+              ],
+              resources: ['*'],
+            }),
+            new PolicyStatement({
+              actions: ['s3:GetObject', 's3:ListBucket'],
+              resources: ['arn:aws:s3:::athena-examples*'],
+            }),
+          ],
+        }),
+      },
+
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
         ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          'AmazonAthenaFullAccess',
-        ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          'AmazonS3FullAccess',
-        ),
       ],
     });
 
-    const generateAthenaQuery = new Function(this, 'generateAthenaQueryLambda', {
-      code: Code.fromAsset('src/resources/generateAthenaQuery'),
-      runtime: Runtime.PYTHON_3_9,
-      handler: 'index.handler',
-      role: generateAthenaQueryRole,
-      timeout: Duration.seconds(15),
-      environment: {
-        LOG_LEVEL: props.logLevel,
-        DATABASE: 'amazon_chime_sdk_voice_connector_cdrs',
-        TABLE: 'processed_cdrs',
-        TARGET_BUCKET: props.s3QueryOutput.bucketName,
-        ATHENA_QUERY: props.athenaQuery,
+    const generateAthenaQuery = new Function(
+      this,
+      'generateAthenaQueryLambda',
+      {
+        code: Code.fromAsset('src/resources/generateAthenaQuery'),
+        runtime: Runtime.PYTHON_3_9,
+        handler: 'index.handler',
+        role: generateAthenaQueryRole,
+        timeout: Duration.seconds(15),
+        environment: {
+          LOG_LEVEL: props.logLevel,
+          DATABASE: 'amazon_chime_sdk_voice_connector_cdrs',
+          TABLE: 'processed_cdrs',
+          TARGET_BUCKET: props.s3QueryOutput.bucketName,
+          OUTPUT_PREFIX: props.outputPrefix,
+          ATHENA_QUERY: props.athenaQuery,
+        },
       },
-    });
-
-    props.s3QueryOutput.grantReadWrite(generateAthenaQuery);
+    );
 
     const schedulerRole = new Role(this, 'schedulerRole', {
       assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
@@ -129,16 +192,14 @@ export class LambdaResources extends Construct {
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
         ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          'service-role/AWSLambdaRole',
-        ),
+        // ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaRole'),
       ],
     });
 
     new CfnResource(this, 'recurringSchedule', {
       type: 'AWS::Scheduler::Schedule',
       properties: {
-        Name: 'recurringSchedule',
+        Name: 'CDRReportSchedule',
         Description: 'Runs a schedule for every x minutes',
         FlexibleTimeWindow: { Mode: 'OFF' },
         ScheduleExpression: props.cronSetting,
@@ -151,12 +212,19 @@ export class LambdaResources extends Construct {
 
     const sendQueryReportRole = new Role(this, 'sendQueryReportRole', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      inlinePolicies: {
+        ['snsPolicy']: new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              actions: ['sns:Publish'],
+              resources: [props.snsTopic.topicArn],
+            }),
+          ],
+        }),
+      },
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
-        ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          'AmazonSNSFullAccess',
         ),
       ],
     });
@@ -174,11 +242,10 @@ export class LambdaResources extends Construct {
     });
 
     props.s3QueryOutput.grantReadWrite(sendQueryReport);
-    props.rawCdrsBucket.bucketName;
     props.s3QueryOutput.addEventNotification(
       EventType.OBJECT_CREATED,
       new LambdaDestination(sendQueryReport),
-      { suffix: '.csv' },
+      { suffix: '.csv', prefix: `${props.outputPrefix}/` },
     );
   }
 }
