@@ -277,7 +277,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "projection.month.type": "integer",
             "projection.year.range": "2023,2026",
             "projection.year.type": "integer",
-            "transient_lastDdlTime": "1692910697",
+            "transient_lastDdlTime": "1693101370",
           },
           "PartitionKeys": [
             {
@@ -659,7 +659,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
     },
     "LambdaResourcesgenerateAthenaQueryLambda7A174AD6": {
       "DependsOn": [
-        "LambdaResourcesgenerateAthenaQueryRoleDefaultPolicyC3054D2E",
         "LambdaResourcesgenerateAthenaQueryRoleE1C9109A",
       ],
       "Properties": {
@@ -667,13 +666,14 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-1",
           },
-          "S3Key": "8e2a20e66a40917a1989d876110b86ee704400b4d7074079fbddad340544dac2.zip",
+          "S3Key": "5baec6087565bf9406eb2161dccef004c677aff6712af827126a95a5d921c441.zip",
         },
         "Environment": {
           "Variables": {
             "ATHENA_QUERY": "SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;",
             "DATABASE": "amazon_chime_sdk_voice_connector_cdrs",
             "LOG_LEVEL": "INFO",
+            "OUTPUT_PREFIX": "",
             "TABLE": "processed_cdrs",
             "TARGET_BUCKET": {
               "Ref": "S3QueryOutputathenaQueryOutput7FBD2000",
@@ -691,59 +691,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
         "Timeout": 15,
       },
       "Type": "AWS::Lambda::Function",
-    },
-    "LambdaResourcesgenerateAthenaQueryRoleDefaultPolicyC3054D2E": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*",
-                "s3:DeleteObject*",
-                "s3:PutObject",
-                "s3:PutObjectLegalHold",
-                "s3:PutObjectRetention",
-                "s3:PutObjectTagging",
-                "s3:PutObjectVersionTagging",
-                "s3:Abort*",
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "S3QueryOutputathenaQueryOutput7FBD2000",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "S3QueryOutputathenaQueryOutput7FBD2000",
-                          "Arn",
-                        ],
-                      },
-                      "/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "LambdaResourcesgenerateAthenaQueryRoleDefaultPolicyC3054D2E",
-        "Roles": [
-          {
-            "Ref": "LambdaResourcesgenerateAthenaQueryRoleE1C9109A",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
     },
     "LambdaResourcesgenerateAthenaQueryRoleE1C9109A": {
       "Properties": {
@@ -772,29 +719,150 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               ],
             ],
           },
+        ],
+        "Policies": [
           {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
+            "PolicyDocument": {
+              "Statement": [
                 {
-                  "Ref": "AWS::Partition",
+                  "Action": [
+                    "athena:StartQueryExecution",
+                    "athena:GetQueryExecution",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
                 },
-                ":iam::aws:policy/AmazonAthenaFullAccess",
               ],
-            ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "athenaPolicy",
           },
           {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
+            "PolicyDocument": {
+              "Statement": [
                 {
-                  "Ref": "AWS::Partition",
+                  "Action": "glue:GetTable",
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:glue:us-east-1:",
+                          {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":table/",
+                          {
+                            "Ref": "GlueResourcesAmazonChimeSdkVoiceConnectorCdrsDB7BCD97",
+                          },
+                          "/",
+                          {
+                            "Ref": "GlueResourcesprocessedCdrsTable9AACF8FC",
+                          },
+                        ],
+                      ],
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:us-east-1:",
+                          {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":catalog",
+                        ],
+                      ],
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:us-east-1:",
+                          {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":database/",
+                          {
+                            "Ref": "GlueResourcesAmazonChimeSdkVoiceConnectorCdrsDB7BCD97",
+                          },
+                        ],
+                      ],
+                    },
+                  ],
                 },
-                ":iam::aws:policy/AmazonS3FullAccess",
               ],
-            ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "gluePolicy",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetBucketLocation",
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:AbortMultipartUpload",
+                    "s3:PutObject",
+                    "s3:ListMultipartUploadParts",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "S3QueryOutputathenaQueryOutput7FBD2000",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          {
+                            "Fn::GetAtt": [
+                              "S3QueryOutputathenaQueryOutput7FBD2000",
+                              "Arn",
+                            ],
+                          },
+                          "/*",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation",
+                    "s3:ListAllMyBuckets",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+                {
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3:::athena-examples*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "s3Policy",
           },
         ],
       },
@@ -1045,7 +1113,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               ],
               "Version": "2012-10-17",
             },
-            "PolicyName": "stateMachinePolicy",
+            "PolicyName": "firehosePolicy",
           },
         ],
       },
@@ -1057,7 +1125,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
         "FlexibleTimeWindow": {
           "Mode": "OFF",
         },
-        "Name": "recurringSchedule",
+        "Name": "CDRReportSchedule",
         "ScheduleExpression": "cron(0 0 1 * ? *)",
         "Target": {
           "Arn": {
@@ -1100,18 +1168,6 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                   "Ref": "AWS::Partition",
                 },
                 ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaRole",
               ],
             ],
           },
@@ -1231,17 +1287,22 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               ],
             ],
           },
+        ],
+        "Policies": [
           {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
+            "PolicyDocument": {
+              "Statement": [
                 {
-                  "Ref": "AWS::Partition",
+                  "Action": "sns:Publish",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "SnsResourcesCDRReport0EE251E8",
+                  },
                 },
-                ":iam::aws:policy/AmazonSNSFullAccess",
               ],
-            ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "snsPolicy",
           },
         ],
       },
@@ -1332,6 +1393,10 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                     {
                       "Name": "suffix",
                       "Value": ".csv",
+                    },
+                    {
+                      "Name": "prefix",
+                      "Value": "/",
                     },
                   ],
                 },
@@ -1598,6 +1663,9 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Type": "Custom::S3BucketNotifications",
     },
     "SnsResourcesCDRReport0EE251E8": {
+      "Properties": {
+        "TopicName": "CDRQueryReport",
+      },
       "Type": "AWS::SNS::Topic",
     },
   },

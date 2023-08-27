@@ -28,6 +28,7 @@ export interface AmazonChimeSdkVoiceConnectorCdrsProps extends StackProps {
   projectionYearMax: string;
   cronSetting: string;
   athenaQuery: string;
+  outputPrefix: string;
 }
 
 export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
@@ -81,23 +82,22 @@ export class AmazonChimeSdkVoiceConnectorCdrs extends Stack {
       email: props.email,
     });
 
-    const s3QueryOutput = new S3QueryOutput(
-      this,
-      'S3QueryOutput',
-      {
-        removalPolicy: props.removalPolicy,
-      },
-    );
+    const s3QueryOutput = new S3QueryOutput(this, 'S3QueryOutput', {
+      removalPolicy: props.removalPolicy,
+    });
 
     new LambdaResources(this, 'LambdaResources', {
       logLevel: props.logLevel,
       fileCount: props.fileCount,
       rawCdrsBucket: rawCdrsBucket,
+      cdrDatabaseName: glueResources.cdrDatabase,
+      processedCdrsTable: glueResources.processedCdrsTable,
       s3QueryOutput: s3QueryOutput.athenaQueryOutput,
       kinesisStream: kinesisResources.kinesisStream,
       cronSetting: props.cronSetting,
       athenaQuery: props.athenaQuery,
       snsTopic: snsResources.topic,
+      outputPrefix: props.outputPrefix,
     });
   }
 }
@@ -120,9 +120,12 @@ const stackProps = {
   projectionYearMax: process.env.PROJECTION_YEAR_MAX || '2026',
   bufferHintSize: process.env.BUFFER_HINT_SIZE || '128',
   bufferHintInterval: process.env.BUFFER_HINT_INTERVAL || '300',
-  athenaQuery: process.env.ATHENA_QUERY || 'SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM %s.%s WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;',
+  athenaQuery:
+    process.env.ATHENA_QUERY ||
+    'SELECT voiceconnectorId, SUM(billabledurationseconds) as billabledurationseconds, SUM(billabledurationminutes) as billabledurationminutes FROM "amazon_chime_sdk_voice_connector_cdrs"."processed_cdrs" WHERE year = YEAR(CURRENT_DATE) AND month = MONTH(CURRENT_DATE) - 1 group by voiceconnectorid;',
   cronSetting: process.env.CRON || 'cron(0 0 1 * ? *)',
   email: process.env.EMAIL || '',
+  outputPrefix: process.env.OUTPUT_PREFIX || 'scheduled_output',
 };
 
 new AmazonChimeSdkVoiceConnectorCdrs(
